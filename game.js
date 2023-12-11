@@ -2,7 +2,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 let playerX = 50;
-const playerY = canvas.height / 2;
+let playerY = canvas.height / 2;
 const playerWidth = 100;
 const playerHeight = 10;
 const playerSpeed = 5;
@@ -24,8 +24,14 @@ function movePlayer(event) {
     case 'ArrowLeft':
       playerX -= playerSpeed;
       break;
+    case 'ArrowUp':
+      playerY -= playerSpeed;
+      break;
+    case 'ArrowDown':
+      playerY += playerSpeed;
+      break;
   }
-
+  
   checkOverlap();
   draw();
 }
@@ -66,7 +72,7 @@ function draw() {
 
   if (showCircle) {
     ctx.beginPath();
-    ctx.arc(humanX + humanWidth / 2, humanY + 60, 30, 0, Math.PI * 2);
+    ctx.arc(humanX + humanWidth / 2, playerY, 30, 0, Math.PI * 2);
     ctx.fillStyle = 'red';
     ctx.fill();
   }
