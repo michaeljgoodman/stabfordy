@@ -19,6 +19,50 @@ let canOverlap = true; // Flag to allow overlap detection
 
 document.addEventListener('keydown', movePlayer);
 
+// Add touch event listeners for mobile drag and drop
+let isDragging = false;
+let touchStartX, touchStartY;
+
+canvas.addEventListener('touchstart', handleTouchStart);
+canvas.addEventListener('touchmove', handleTouchMove);
+canvas.addEventListener('touchend', handleTouchEnd);
+
+function handleTouchStart(event) {
+  isDragging = true;
+  touchStartX = event.touches[0].clientX - canvas.getBoundingClientRect().left;
+  touchStartY = event.touches[0].clientY - canvas.getBoundingClientRect().top;
+}
+
+function handleTouchMove(event) {
+  if (!isDragging) return;
+
+  event.preventDefault();
+
+  let touchX = event.touches[0].clientX - canvas.getBoundingClientRect().left;
+  let touchY = event.touches[0].clientY - canvas.getBoundingClientRect().top;
+
+  let deltaX = touchX - touchStartX;
+  let deltaY = touchY - touchStartY;
+
+  let newX = playerX + deltaX;
+  let newY = playerY + deltaY;
+
+  if (!checkCollision(newX, newY)) {
+    playerX = newX;
+    playerY = newY;
+    draw();
+  }
+
+  touchStartX = touchX;
+  touchStartY = touchY;
+}
+
+function handleTouchEnd() {
+  isDragging = false;
+}
+
+
+
 function movePlayer(event) {
   let newX = playerX;
   let newY = playerY;
