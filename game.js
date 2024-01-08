@@ -1,6 +1,29 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+function setCanvasSize() {
+  if (isMobileDevice()) {
+    if (screen.orientation.type.includes('portrait')) {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    } else {
+      // Force portrait mode
+      screen.orientation.lock('portrait');
+    }
+  } else {
+    canvas.width = 800; // Default width for non-mobile
+    canvas.height = 400; // Default height for non-mobile
+  }
+}
+
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+setCanvasSize();
+window.addEventListener('resize', setCanvasSize);
+
+
 let fordyDead = 0;
 let playerX = 50;
 let playerY = canvas.height / 2;
