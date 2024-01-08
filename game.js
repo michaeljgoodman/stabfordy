@@ -1,6 +1,7 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+let fordyDead = 0;
 let playerX = 50;
 let playerY = canvas.height / 2;
 const playerWidth = 100;
@@ -12,41 +13,68 @@ const humanY = canvas.height / 2 - 50;
 const humanWidth = 50;
 const humanHeight = 100;
 
-let showCircle = false;
+const redCircles = []; // Array to store red circles
+
+let canOverlap = true; // Flag to allow overlap detection
 
 document.addEventListener('keydown', movePlayer);
 
 function movePlayer(event) {
+  let newX = playerX;
+  let newY = playerY;
+
   switch (event.key) {
     case 'ArrowRight':
-      playerX += playerSpeed;
+      newX += playerSpeed;
       break;
     case 'ArrowLeft':
-      playerX -= playerSpeed;
+      newX -= playerSpeed;
       break;
     case 'ArrowUp':
-      playerY -= playerSpeed;
+      newY -= playerSpeed;
       break;
     case 'ArrowDown':
-      playerY += playerSpeed;
+      newY += playerSpeed;
       break;
   }
-  
-  checkOverlap();
-  draw();
+
+  // Check if the new position would cause an overlap
+  if (!checkCollision(newX, newY)) {
+    playerX = newX;
+    playerY = newY;
+    draw();
+  }
 }
 
-function checkOverlap() {
+function checkCollision(x, y) {
   if (
-    playerX < humanX + humanWidth &&
-    playerX + playerWidth > humanX &&
-    playerY < humanY + humanHeight &&
-    playerY + playerHeight > humanY
+    x < humanX + humanWidth &&
+    x + playerWidth > humanX &&
+    y < humanY + humanHeight &&
+    y + playerHeight > humanY &&
+    canOverlap
   ) {
-    showCircle = true;
-  } else {
-    showCircle = false;
+    createRedCircle(playerY + playerHeight / 2);
+    canOverlap = false; // Prevent further overlap until under-overlap
+    return true; // Collision detected
+  } else if (!canOverlap && !(
+    x < humanX + humanWidth &&
+    x + playerWidth > humanX &&
+    y < humanY + humanHeight &&
+    y + playerHeight > humanY
+  )) {
+    canOverlap = true; // Allow overlap detection after under-overlap
   }
+  return false; // No collision detected
+}
+
+function createRedCircle(y) {
+  redCircles.push({ x: humanX + humanWidth / 2, y: y, radius: 10 });
+  fordyDead = 1;
+  ctx.beginPath();
+  ctx.arc(humanX + humanWidth / 2, y, 10, 0, Math.PI * 2);
+  ctx.fillStyle = 'red';
+  ctx.fill();
 }
 
 function draw() {
@@ -70,14 +98,15 @@ function draw() {
   ctx.lineTo(humanX + humanWidth / 2 + 20, humanY + 30);
   ctx.stroke();
 
-  if (showCircle) {
+  // Draw red circles
+  ctx.fillStyle = 'red';
+  redCircles.forEach(circle => {
     ctx.beginPath();
-    ctx.arc(humanX + humanWidth / 2, playerY, 30, 0, Math.PI * 2);
-    ctx.fillStyle = 'red';
+    ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
     ctx.fill();
-  }
+  });
 
-  if (showCircle) {
+  if (fordyDead == 1) {
     ctx.font = '20px Arial';
     ctx.fillStyle = 'red';
     ctx.fillText('Nice. You stabbed Fordy!', canvas.width / 2 - 150, canvas.height / 2 + 50);
